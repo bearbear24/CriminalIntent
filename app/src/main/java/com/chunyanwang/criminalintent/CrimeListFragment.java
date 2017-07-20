@@ -1,9 +1,11 @@
 package com.chunyanwang.criminalintent;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,12 +16,14 @@ import android.widget.Toast;
 import org.w3c.dom.Text;
 
 import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * Created by chunyanwang on 4/18/17.
  */
 
 public class CrimeListFragment extends Fragment {
+    private static final String TAG  = "CrimeListFragment";
 
     private RecyclerView recyclerView;
     private CrimeAdapter adapter;
@@ -48,7 +52,10 @@ public class CrimeListFragment extends Fragment {
 
         @Override
         public void onClick(View v) {
-            Toast.makeText(getActivity(), crime.title() + " clicked!", Toast.LENGTH_SHORT).show();
+//            Toast.makeText(getActivity(), crime.title() + " clicked!", Toast.LENGTH_SHORT).show();
+            Intent intent = CrimeActivity.newIntent(getActivity(), crime.getId());
+            Log.d(TAG, "crime id" + crime.getId().toString());
+            startActivity(intent);
         }
     }
 
@@ -87,10 +94,20 @@ public class CrimeListFragment extends Fragment {
         return view;
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        updateUI();
+    }
+
     private void updateUI() {
         CrimeLab crimeLab = CrimeLab.get(getActivity());
         List<Crime> crimes = crimeLab.getCrimes();
-        adapter = new CrimeAdapter(crimes);
-        recyclerView.setAdapter(adapter);
+        if (adapter == null) {
+            adapter = new CrimeAdapter(crimes);
+            recyclerView.setAdapter(adapter);
+        } else {
+            adapter.notifyDataSetChanged();
+        }
     }
 }
